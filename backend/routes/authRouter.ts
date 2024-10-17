@@ -35,6 +35,7 @@ app.post('/signup',zValidator("json",z.object({
     const prisma = c.get('prisma');
     try {
         const {name, email, password} = c.req.valid("json");
+        // const { name, email, password } = await c.req.json();
         if(!name || !email || !password){
             return c.json({message:"Invalid data"},400);
         }
@@ -112,5 +113,10 @@ app.post('/signin',
         }
     }
 );
+
+app.post('logout',(c)=>{
+    setCookie(c, 'token', '', {maxAge: 0});
+    return c.json({message:"User logged out successfully"}, 200);
+})
 
 export default app;

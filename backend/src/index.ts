@@ -20,7 +20,14 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>()
 
-app.use('/*', cors())
+app.use('/*', cors({
+  origin: 'http://localhost:3000',
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+  exposeHeaders: ['Content-Length'],
+  maxAge: 600,
+    credentials: true,
+}))
 app.use('*',async(c,next)=>{
   const prisma = new PrismaClient({
     datasourceUrl: c.env.DATABASE_URL,
