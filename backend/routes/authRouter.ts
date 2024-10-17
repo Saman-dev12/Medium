@@ -6,6 +6,7 @@ import { z } from "zod";
 import bcrypt from 'bcryptjs';
 import { sign } from "hono/jwt";
 import { setCookie } from "hono/cookie";
+import argon2 from "argon2-browser"
 
 type Env = {
     DATABASE_URL : string,
@@ -16,6 +17,15 @@ type Variables = {
     prisma:any
   }
 const app = new Hono<{Bindings:Env,Variables:Variables}>()
+
+async function hashPassword(password: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer)); 
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  }
 
 app.post('/signup',zValidator("json",z.object({
     name:z.string(),
@@ -38,9 +48,8 @@ app.post('/signup',zValidator("json",z.object({
             return c.json({message:"User already exists"}, 400);
         }
 
-        // Hash user password
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync(password, salt);
+        
+        const hashedPassword = await hashPassword(password)
 
         const user = await prisma.user.create({
             data: {
@@ -85,8 +94,9 @@ app.post('/signin',
                 return c.json({message:"User not found"}, 400);
             }
 
-            const isPasswordValid = bcrypt.compareSync(password, user.password);
-            if(!isPasswordValid){
+
+            const hashedPassword = await hashPassword(password)
+            if(!(hashedPassword === user.password)){
                 return c.json({message:"Invalid password"}, 400);
             }
 

@@ -37,19 +37,18 @@ app.use('/api/v1/blog/*', async (c, next) => {
   }
 
   try {
-    const decoded = await verify(token, c.env.JWT_SECRET);
-    if(!decoded.id){
+    const decoded = await verify(token, c.env.JWT_SECRET) as { id: string };
+    if (!decoded.id) {
       return c.json({ message: 'Invalid token' }, 401);
     }
-    //@ts-ignore
-    c.set('user', decoded);
-    await next();
 
+    c.set('userId', decoded.id);
+    await next();
   } catch (error) {
     return c.json({ message: 'Invalid token' }, 401);
   }
-
 });
+
 app.get('/', (c) => {
   return c.text("Hello")
 })
