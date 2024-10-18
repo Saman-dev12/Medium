@@ -23,7 +23,7 @@ function DashHead() {
             <Link href="/create-blog">
               <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full">Write a story</Button>
             </Link>
-            <Button variant="ghost" onClick={handleLogout}>Logout</Button>
+            <Button variant="outline" onClick={handleLogout}>Logout</Button>
             
         
             

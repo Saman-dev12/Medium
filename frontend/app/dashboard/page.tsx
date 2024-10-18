@@ -17,12 +17,14 @@ async function getBlogs() {
   const token = cookieStore.get('token')?.value
 
   try {
+      // const response = await axios.get(`http://127.0.0.1:8787/api/v1/blog/getall`, {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/blog/getall`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
-    return response.data.posts;
+    // const returnArray = response.data.posts.reverse();
+    return response.data.posts.reverse();
   } catch (error) {
     console.error('Error fetching blogs:', error);
     return [];
